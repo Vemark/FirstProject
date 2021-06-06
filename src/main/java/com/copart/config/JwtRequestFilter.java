@@ -1,6 +1,7 @@
 package com.copart.config;
 
 import com.copart.service.impl.JwtUserDetailsService;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,8 +38,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         username = jwtTokenUtil.getUsernameFromToken(jwtToken);
       } catch (IllegalArgumentException e) {
         logger.error("Unable to get JWT Token");
-        //			} catch (ExpiredJwtException e) {
-        //				logger.error("JWT Token has expired");
+      } catch (ExpiredJwtException e) {
+        logger.error("JWT Token has expired");
       }
     } else {
       logger.warn("JWT Token does not begin with Bearer String");
