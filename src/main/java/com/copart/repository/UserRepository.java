@@ -1,8 +1,10 @@
 package com.copart.repository;
 
-import com.copart.entity.Inventory;
+import com.copart.entity.User;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface InventoryRepository extends PagingAndSortingRepository<Inventory, Long> {}
+public interface UserRepository extends PagingAndSortingRepository<User, Long> {
+  User findByUsername(String username);
+}

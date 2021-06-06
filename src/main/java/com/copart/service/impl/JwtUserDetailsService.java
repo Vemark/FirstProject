@@ -1,28 +1,28 @@
 package com.copart.service.impl;
 
+import com.copart.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import static java.util.Collections.emptyList;
 
 @Service
+@Transactional(readOnly = true)
 public class JwtUserDetailsService implements UserDetailsService {
-  private final static String DEFAULT_USERNAME = "admin";
-  private final static String DEFAULT_PASSWORD = "password";
-  private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+  @Autowired private UserRepository userRepository;
 
   @Override
   public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-    if (DEFAULT_USERNAME.equals(username)) {
-      String hashedPassword =
-          passwordEncoder.encode(
-                  DEFAULT_PASSWORD);
-      return new User(DEFAULT_USERNAME, hashedPassword, Collections.emptyList());
+    com.copart.entity.User user = userRepository.findByUsername(username);
+    if (user == null) {
+      throw new UsernameNotFoundException("User not found with username: " + username);
     }
-    throw new UsernameNotFoundException("User not found with username: " + username);
+    return new User(user.getUsername(), user.getPassword(), emptyList());
   }
 }
