@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@vemarkdev.cyyrmbq2yg8w.us-east-1.rds.amazonaws.com:1521:TSTORCL
+    username: salvagenow
+    password: salvagenow39665
