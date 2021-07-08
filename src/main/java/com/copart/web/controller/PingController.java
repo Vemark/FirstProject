@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class HelloWorldController {
+public class PingController {
 
-  @RequestMapping("/hello")
-  public ResponseEntity<String> firstPage() {
-    return ResponseEntity.ok("Hello World");
+  @RequestMapping("/ping")
+  public ResponseEntity<?> firstPage() {
+    return ResponseEntity.ok("{\"currentTime\": " + System.currentTimeMillis() + "}");
   }
 }
