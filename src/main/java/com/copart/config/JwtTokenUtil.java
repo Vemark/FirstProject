@@ -1,5 +1,6 @@
 package com.copart.config;
 
+import com.copart.model.CopartUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
+import static java.util.Optional.ofNullable;
+
 @Component
 public class JwtTokenUtil implements Serializable {
 
@@ -25,6 +28,12 @@ public class JwtTokenUtil implements Serializable {
   // retrieve username from jwt token
   public String getUsernameFromToken(String token) {
     return getAllClaimsFromToken(token).getSubject();
+  }
+
+  public String getDomainFromToken(String token) {
+    return ofNullable(getAllClaimsFromToken(token).get("domain"))
+        .map(Object::toString)
+        .orElse(null);
   }
 
   // retrieve expiration date from jwt token
@@ -46,6 +55,7 @@ public class JwtTokenUtil implements Serializable {
   // generate token for user
   public String generateToken(UserDetails userDetails) {
     Map<String, Object> claims = new HashMap<>();
+    claims.put("domain", ((CopartUserDetails) userDetails).getDomain());
     return doGenerateToken(claims, userDetails.getUsername());
   }
 

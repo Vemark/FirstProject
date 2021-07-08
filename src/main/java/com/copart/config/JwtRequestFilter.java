@@ -2,6 +2,7 @@ package com.copart.config;
 
 import com.copart.service.impl.JwtUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +30,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     String requestTokenHeader = request.getHeader("Authorization");
     String username = null;
+    String domain = null;
     String jwtToken = null;
     // JWT Token is in the form "Bearer token". Remove Bearer word and get
     // only the Token
@@ -36,6 +38,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       jwtToken = requestTokenHeader.substring(7);
       try {
         username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+        domain = jwtTokenUtil.getDomainFromToken(jwtToken);
       } catch (IllegalArgumentException e) {
         logger.error("Unable to get JWT Token");
       } catch (ExpiredJwtException e) {
@@ -46,7 +49,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
     // Once we get the token validate it.
     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
+      UserDetails userDetails =
+          jwtUserDetailsService.loadUserByUsername(
+              StringUtils.isEmpty(domain) ? username : (domain + ":" + username));
       // if token is valid configure Spring Security to manually set
       // authentication
       if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
