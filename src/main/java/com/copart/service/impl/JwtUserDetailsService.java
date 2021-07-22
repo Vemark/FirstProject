@@ -52,6 +52,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     userDetails.setId(domainUser.getId());
     userDetails.setUsername(domainUser.getUsername());
     userDetails.setPassword(domainUser.getPasswordHash() + "");
+    userDetails.setPasswordHashed(true);
     userDetails.setDomain(domainUser.getLoginDomain());
     return userDetails;
   }

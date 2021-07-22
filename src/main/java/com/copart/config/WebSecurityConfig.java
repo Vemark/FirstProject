@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.Objects;
 
+import static com.copart.constant.Constants.HASHED;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -39,12 +41,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     return new PasswordEncoder() {
       @Override
       public String encode(final CharSequence charSequence) {
-        return charSequence.toString();
+        return encode(charSequence.toString());
       }
 
       @Override
       public boolean matches(final CharSequence charSequence, final String str) {
+        if (str.startsWith(HASHED)) {
+          return Objects.equals(charSequence.toString(), encode(str.split(HASHED)[1]));
+        }
         return Objects.equals(charSequence.toString(), str);
+      }
+
+      private String encode(String chars) {
+        String str = "!@" + chars + "$%";
+
+        int INIT_HASH = 7217;
+        int LOOP_VAL = 39;
+        int HASH_PRIME = 10000001;
+
+        int result = INIT_HASH;
+        for (int x = 0; x < str.length(); x++) {
+          result = (result + str.charAt(x) * LOOP_VAL) % HASH_PRIME;
+        }
+
+        return "" + result;
       }
     };
   }

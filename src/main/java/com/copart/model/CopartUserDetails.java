@@ -6,12 +6,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+import static com.copart.constant.Constants.HASHED;
+
 @Data
 public class CopartUserDetails implements UserDetails {
 
   private Long id;
   private String username;
   private String password;
+  private boolean isPasswordHashed;
   private String domain;
 
   @Override
@@ -21,6 +24,9 @@ public class CopartUserDetails implements UserDetails {
 
   @Override
   public String getPassword() {
+    if (this.isPasswordHashed) {
+      return HASHED + password;
+    }
     return password;
   }
 
